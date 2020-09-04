@@ -1,0 +1,32 @@
+{
+    "name": "manifest.default",
+    "infrastructure": {
+        "provider": "aws",
+        "credentialsId": "aws_creds",
+        "endpoint_types": [
+            {
+                "count": 1,
+                "type": "rhel",
+                "user": "ec2-user",
+                "credentialsId": "rhel_ssh_key"
+            }
+        ]
+    },
+    "ansible": {
+        "endpoint_types": [
+            {
+                "type": "rhel",
+                "playbooks": [
+                    {
+                        "file": "install_wildfly.yml",
+                        "extra_args": [
+                            {
+                                "enable_firewall": "false"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ] 
+    }
+}

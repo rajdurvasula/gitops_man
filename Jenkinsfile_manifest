@@ -1,0 +1,21 @@
+#!groovy
+
+@Library('jenkins-shared-library')
+
+pipeline {
+    agent any
+
+    parameters {
+        string(name: 'manifest', defaultValue: 'manifest.default.json', description: 'Manifest from Git source')
+    }
+
+    stages {
+        stage('Read Config') {
+            steps {
+                deployWithManifest([
+                    manifestfile: "${params.manifest}"
+                ])
+            }
+        }
+    }
+}
