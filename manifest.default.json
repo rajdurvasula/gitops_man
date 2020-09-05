@@ -12,6 +12,10 @@
             }
         ]
     },
+    "terraform": {
+        "provider": "aws",
+        "file": "aws/resources.tf"
+    },
     "ansible": {
         "endpoint_types": [
             {
@@ -23,6 +27,15 @@
                             {
                                 "enable_firewall": "false"
                             }
+                        ],
+                        "tags": [
+                            "setup", "sample"
+                        ]
+                    },
+                    {
+                        "file": "test.yml",
+                        "tags": [
+                            "test"
                         ]
                     }
                 ]
