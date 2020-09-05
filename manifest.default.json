@@ -13,8 +13,11 @@
         ]
     },
     "terraform": {
-        "provider": "aws",
-        "file": "aws/resources.tf"
+        "aws": {
+            "rhel": {
+                "file": "aws/rhel/resources.tf"
+            }
+        }
     },
     "ansible": {
         "endpoint_types": [

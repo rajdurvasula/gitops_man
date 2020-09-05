@@ -17,5 +17,22 @@ pipeline {
                 ])
             }
         }
+        stage('Launch Infrastructure Pipeline') {
+            steps {
+                def manifest = readJSON file: "${params.manifest}"
+                def job
+                if (manifest.infrastructure.provider == "aws") {
+                    if (manifest.infrastructure.endpoint_types[?type == 'rhel']) {
+                        job = build job: "aws_rhel_infra_pipeline",
+                        parameters: [
+                            [$class: 'StringParameterValue', name: 'aws_cred_id', manifest.infrastructure.credentialsId],
+                            [$class: 'StringParameterValue', name: 'inst_count', manifest.endpoint_types[type=='rhel'].count],
+                            [$class: 'StringParameterValue', name: 'inst_user', manifest.endpoint_types[type=='rhel'].user],
+                            [$class: 'StringParameterValue', name: 'ssh_cred_id', manifest.endpoint_types[type=='rhel'].credentialsId],
+                        ]
+                    }
+                }
+            }
+        }
     }
 }
