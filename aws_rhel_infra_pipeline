@@ -40,7 +40,7 @@ pipeline {
           sh 'cp "$SSH_KEY" $HOME/rd_ssh_key.pem'
         }
         script {
-            int inst_count = "${param_inst_count}" as Integer
+            sh 'cd ${terraform_ws} && echo \"ansible_user = \"${param_ansible_user}\"\" > input.tfvars'
         }
         withCredentials([[
           $class: 'AmazonWebServicesCredentialsBinding',
@@ -48,7 +48,7 @@ pipeline {
           accessKeyVariable: 'AWS_ACCESS_KEY_ID',
           secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
         ]]) {
-          sh 'cd ${terraform_ws} && terraform plan -out test.plan -var ansible_user=${param_ansible_user}'
+          sh 'cd ${terraform_ws} && terraform plan -out test.plan -var-file input.tfvars'
         }
       }
     }
@@ -66,7 +66,7 @@ pipeline {
           accessKeyVariable: 'AWS_ACCESS_KEY_ID',
           secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
         ]]) {
-          sh 'cd ${terraform_ws} && terraform apply -auto-approve'
+          sh 'cd ${terraform_ws} && terraform apply -auto-approve test.plan'
         }
       }
     }
