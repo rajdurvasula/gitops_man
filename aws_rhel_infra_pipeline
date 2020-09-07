@@ -28,7 +28,6 @@ pipeline {
             }
         }
     stage("prepare") {
-        def inst_count
       agent {
         label 'config_node'
       }
@@ -41,7 +40,7 @@ pipeline {
           sh 'cp "$SSH_KEY" $HOME/rd_ssh_key.pem'
         }
         script {
-            inst_count = ${param_inst_count} as Integer
+            def inst_count = ${param_inst_count} as Integer
         }
         withCredentials([[
           $class: 'AmazonWebServicesCredentialsBinding',
