@@ -24,12 +24,9 @@ pipeline {
                     secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
                 ]]) {
                     sh 'terraform workspace new ${terraform_ws_name} ${terraform_ws}'
-                    sh 'terraform init'
-                }
-                script {
-                    writeFile file: "${terraform_ws}/input.tfvars", text: "rhel_inst_count: ${rhel_inst_count}"
-                    def readContent = readFile "${terraform_ws}/input.tfvars"
-                    writeFile file: "${terraform_ws}/input.tfvars", text: readContent+"\r\nansible_user: ${ansible_user}"
+                    sh 'terraform init ${terraform_ws_name}'
+                    sh 'echo rhel_inst_count: ${rhel_inst_count}' > ${terraform_ws}/input.tfvars
+                    sh 'echo ansible_user: ${ansible_user}' >> ${terraform_ws}/input.tfvars
                 }
             }
         }
@@ -52,7 +49,7 @@ pipeline {
           secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
         ]]) {
           sh 'terraform workspace select ${terraform_ws_name}'
-          sh 'terraform plan -out test.plan'
+          sh 'terraform plan -out=${terraform_ws}/test.plan -var-file=${terraform_ws}/input.tfvars ${terraform_ws}'
         }
       }
     }
@@ -70,7 +67,8 @@ pipeline {
           accessKeyVariable: 'AWS_ACCESS_KEY_ID',
           secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
         ]]) {
-          sh 'terraform apply -auto-approve'
+          sh 'terraform workspace select ${terraform_ws_name}'
+          sh 'terraform apply -auto-approve -var-file=${terraform_ws}/input.tfvars ${terraform_ws}'
         }
       }
     }
@@ -88,6 +86,7 @@ pipeline {
           accessKeyVariable: 'AWS_ACCESS_KEY_ID',
           secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
         ]]) {
+          sh 'terraform workspace select ${terraform_ws_name}'
           sh 'terraform show'
         }
       }
