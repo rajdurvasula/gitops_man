@@ -42,7 +42,7 @@ resource "aws_instance" "rhel8_client" {
   key_name = var.key_pair_name
   vpc_security_group_ids = [ aws_security_group.my_sg.id ]
   subnet_id = var.my_subnet_id
-  tags = merge({"Name"="rhel8_client_"+$count.index}, var.my_tags)
+  tags = merge({"Name"="rhel8_client_"+count.index}, var.my_tags)
   provisioner "remote-exec" {
     inline = [ "echo 'Hello World'" ]
     connection {
