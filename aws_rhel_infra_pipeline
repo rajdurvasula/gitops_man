@@ -48,7 +48,7 @@ pipeline {
           accessKeyVariable: 'AWS_ACCESS_KEY_ID',
           secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
         ]]) {
-          sh 'cd ${terraform_ws} && terraform plan -out test.plan -var ansible_user=${param_ansible_user} -var rhel_inst_count=$inst_count'
+          sh 'cd ${terraform_ws} && terraform plan -out test.plan -var ansible_user=${param_ansible_user}'
         }
       }
     }
