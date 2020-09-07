@@ -28,6 +28,7 @@ pipeline {
             }
         }
     stage("prepare") {
+        def inst_count
       agent {
         label 'config_node'
       }
@@ -39,13 +40,15 @@ pipeline {
           sh 'rm -f $HOME/rd_ssh_key.pem'
           sh 'cp "$SSH_KEY" $HOME/rd_ssh_key.pem'
         }
+        script {
+            inst_count = ${param_inst_count} as Integer
+        }
         withCredentials([[
           $class: 'AmazonWebServicesCredentialsBinding',
           credentialsId: "${param_aws_creds}",
           accessKeyVariable: 'AWS_ACCESS_KEY_ID',
           secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
         ]]) {
-          def inst_count = ${param_inst_count} as Integer
           sh 'cd ${terraform_ws} && terraform plan -out test.plan -var ansible_user=${param_ansible_user} -var rhel_inst_count=$inst_count'
         }
       }
