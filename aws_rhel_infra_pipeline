@@ -4,7 +4,11 @@ pipeline {
     parameters {
         string defaultValue: 'aws_creds', description: 'AWS cred id', name: 'param_aws_creds'
         string defaultValue: 'rd_ssh_key', description: 'SSH key', name: 'param_ssh_key'
-        string defaultValue: 'input.tfvars', description: 'Terraform input vars file', name: 'input_vars_file', trim: false
+        string defaultValue: 'input.tfvars', description: 'Terraform input vars file', name: 'input_vars_file'
+        string defaultValue: 'test', description: 'Terraform workspace name', name: 'terraform_ws_name'
+        string defaultValue: 'test', description: 'Terraform workspace', name: 'terraform_ws'
+        string defaultValue: 'ansible', description: 'Ansible user', name: 'ansible_user'
+        string defaultValue: '1', description: 'Instance count', name: 'rhel_inst_count'
     }
 
     stages {
@@ -13,16 +17,22 @@ pipeline {
                 label "config_node"
             }
             steps {
-        withCredentials([[
-          $class: 'AmazonWebServicesCredentialsBinding',
-          credentialsId: "${param_aws_creds}",
-          accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-          secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
-        ]]) {
-          sh 'terraform init'
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: "${param_aws_creds}",
+                    accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                    secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+                ]]) {
+                    sh 'terraform init'
+                    sh 'terraform workspace new ${terraform_ws_name} ${terraform_ws}'
+                }
+                script {
+                    writeFile file: "${terraform_ws}/input.tfvars", text: "rhel_inst_count: ${rhel_inst_count}"
+                    def readContent = readFile "${terraform_ws}/input.tfvars"
+                    writeFile file: "${terraform_ws}/input.tfvars", text: readContent+"\r\nansible_user: ${ansible_user}"
+                }
+            }
         }
-      }
-    }
     stage("prepare") {
       agent {
         label 'config_node'
@@ -41,6 +51,7 @@ pipeline {
           accessKeyVariable: 'AWS_ACCESS_KEY_ID',
           secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
         ]]) {
+          sh 'terraform workspace select ${terraform_ws_name}'
           sh 'terraform plan -out test.plan'
         }
       }

@@ -15,6 +15,7 @@
     "terraform": {
         "aws": {
             "rhel": {
+                "ref": "rhel",
                 "path": "aws/rhel",
                 "file": "aws/rhel/resources.tf"
             }
