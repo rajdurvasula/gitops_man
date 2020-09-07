@@ -26,10 +26,10 @@ pipeline {
                     sh 'cd ${terraform_ws} && terraform init'                    
                 }
                 script {
-                    def input_var = 'rhel_inst_count = \"${rhel_inst_count}\"'
+                    def input_var = 'rhel_inst_count = \"'+${rhel_inst_count}+'\"'
                     writeFile file: "${terraform_ws}/input.tfvars", text: "${input_var}"
                     def fileContents = readFile file: "${terraform_ws}/input.tfvars"
-                    input_var = 'ansible_user = \"${ansible_user}\"'
+                    input_var = 'ansible_user = \"'+${ansible_user}+'\"'
                     writeFile file: "${terraform_ws}/input.tfvars", text: "${fileContents}"+'\r\n'+"${input_var}"
                 }
             }
