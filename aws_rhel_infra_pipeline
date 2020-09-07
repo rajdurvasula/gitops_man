@@ -23,8 +23,8 @@ pipeline {
                     accessKeyVariable: 'AWS_ACCESS_KEY_ID',
                     secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
                 ]]) {
-                    sh 'terraform init'
                     sh 'terraform workspace new ${terraform_ws_name} ${terraform_ws}'
+                    sh 'terraform init'
                 }
                 script {
                     writeFile file: "${terraform_ws}/input.tfvars", text: "rhel_inst_count: ${rhel_inst_count}"
