@@ -47,7 +47,7 @@ pipeline {
           accessKeyVariable: 'AWS_ACCESS_KEY_ID',
           secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
         ]]) {
-          sh 'cd ${terraform_ws} && terraform plan -out=test.plan -var-file=input.tfvars'
+          sh 'cd ${terraform_ws} && terraform plan -out test.plan -var-file input.tfvars'
         }
       }
     }
@@ -65,7 +65,7 @@ pipeline {
           accessKeyVariable: 'AWS_ACCESS_KEY_ID',
           secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
         ]]) {
-          sh 'cd ${terraform_ws} && terraform apply -auto-approve -var-file=input.tfvars'
+          sh 'cd ${terraform_ws} && terraform apply -auto-approve -var-file input.tfvars'
         }
       }
     }
