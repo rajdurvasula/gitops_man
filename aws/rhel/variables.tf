@@ -7,6 +7,16 @@ variable "rhel_inst_count" {
   default = 1
 }
 
+variable "name" {
+    default = "rhel8_client"
+}
+
+variable "num_suffix_format" {
+  description = "Numerical suffix format used as the volume and EC2 instance name suffix"
+  type        = string
+  default     = "_%d"
+}
+
 variable "key_pair_name" {
   default = "ibm-rd-sing-kp2"
 }
