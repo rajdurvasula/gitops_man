@@ -37,8 +37,8 @@ pipeline {
                                     [$class: 'StringParameterValue', name: 'input_vars_file', value: "${manifest.terraform.aws.rhel.path}/input.tfvars"],
                                     [$class: 'StringParameterValue', name: 'terraform_ws_name', value: "${manifest.terraform.aws.rhel.ref}"],
                                     [$class: 'StringParameterValue', name: 'terraform_ws', value: "${manifest.terraform.aws.rhel.path}"],
-                                    [$class: 'StringParameterValue', name: 'ansible_user', value: "${ep_type.user}"],
-                                    [$class: 'StringParameterValue', name: 'rhel_inst_count', value: "${ep_type.count}"]
+                                    [$class: 'StringParameterValue', name: 'param_ansible_user', value: "${ep_type.user}"],
+                                    [$class: 'StringParameterValue', name: 'param_inst_count', value: "${ep_type.count}"]
                                 ]
                                 break
                             }

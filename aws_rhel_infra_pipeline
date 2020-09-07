@@ -7,8 +7,8 @@ pipeline {
         string defaultValue: 'input.tfvars', description: 'Terraform input vars file', name: 'input_vars_file'
         string defaultValue: 'test', description: 'Terraform workspace name', name: 'terraform_ws_name'
         string defaultValue: 'test', description: 'Terraform workspace', name: 'terraform_ws'
-        string defaultValue: 'ansible', description: 'Ansible user', name: 'ansible_user'
-        string defaultValue: '1', description: 'Instance count', name: 'rhel_inst_count'
+        string defaultValue: 'ansible', description: 'Ansible user', name: 'param_ansible_user'
+        string defaultValue: '1', description: 'Instance count', name: 'param_inst_count'
     }
 
     stages {
@@ -24,13 +24,6 @@ pipeline {
                     secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
                 ]]) {
                     sh 'cd ${terraform_ws} && terraform init'                    
-                }
-                script {
-                    def input_var = 'rhel_inst_count = \"' +  '${rhel_inst_count}' + '\"'
-                    writeFile file: "${terraform_ws}/input.tfvars", text: "${input_var}"
-                    def fileContents = readFile file: "${terraform_ws}/input.tfvars"
-                    input_var = 'ansible_user = \"' + '${ansible_user}' + '\"'
-                    writeFile file: "${terraform_ws}/input.tfvars", text: "${fileContents}" + '\r\n' + "${input_var}"
                 }
             }
         }
@@ -52,7 +45,7 @@ pipeline {
           accessKeyVariable: 'AWS_ACCESS_KEY_ID',
           secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
         ]]) {
-          sh 'cd ${terraform_ws} && terraform plan -out test.plan -var-file input.tfvars'
+          sh 'cd ${terraform_ws} && terraform plan -out test.plan -var ansible_user=${param_ansible_user} -var rhel_inst_count=${param_inst_count}'
         }
       }
     }
@@ -70,7 +63,7 @@ pipeline {
           accessKeyVariable: 'AWS_ACCESS_KEY_ID',
           secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
         ]]) {
-          sh 'cd ${terraform_ws} && terraform apply -auto-approve -var-file input.tfvars'
+          sh 'cd ${terraform_ws} && terraform apply -auto-approve'
         }
       }
     }
