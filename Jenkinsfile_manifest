@@ -40,9 +40,9 @@ pipeline {
                             
                             job = build job: "aws_rhel_infra_pipeline", wait: true, propagate: true,
                             parameters: [
-                                [$class: 'StringParameterValue', name: 'param_aws_creds', '${manifest.infrastructure.credentialsId}']
-                                [$class: 'StringParameterValue', name: 'param_ssh_key', '${ep_type.credentialsId}']
-                                [$class: 'StringParameterValue', name: 'input_vars_file', '${manifest.terraform.rhel.path}/input.tfvars']
+                                [$class: 'StringParameterValue', name: 'param_aws_creds', "${manifest.infrastructure.credentialsId}"]
+                                [$class: 'StringParameterValue', name: 'param_ssh_key', "${ep_type.credentialsId}"]
+                                [$class: 'StringParameterValue', name: 'input_vars_file', "${manifest.terraform.rhel.path}/input.tfvars"]
                             ]
                             break
                         }
