@@ -23,9 +23,11 @@ pipeline {
                     accessKeyVariable: 'AWS_ACCESS_KEY_ID',
                     secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
                 ]]) {
-                    sh 'cd ${terraform_ws} && terraform init'
-                    sh 'echo rhel_inst_count: ${rhel_inst_count} > ${terraform_ws}/input.tfvars'
-                    sh 'echo ansible_user: ${ansible_user} >> ${terraform_ws}/input.tfvars'
+                    sh 'cd ${terraform_ws} && terraform init'                    
+                }
+                script {
+                    sh 'echo \"rhel_inst_count=${rhel_inst_count}\" > ${terraform_ws}/input.tfvars'
+                    sh 'echo \"ansible_user=${ansible_user}\" >> ${terraform_ws}/input.tfvars'
                 }
             }
         }
