@@ -1,3 +1,7 @@
+#!groovy
+
+@Library('jenkins-shared-library')
+
 pipeline {
     agent none
 
