@@ -40,7 +40,7 @@ pipeline {
           sh 'cp "$SSH_KEY" $HOME/rd_ssh_key.pem'
         }
         script {
-            def inst_count = ${param_inst_count} as Integer
+            int inst_count = "${param_inst_count}" as Integer
         }
         withCredentials([[
           $class: 'AmazonWebServicesCredentialsBinding',
