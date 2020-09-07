@@ -2,7 +2,7 @@
     "name": "manifest.default",
     "infrastructure": {
         "provider": "aws",
-        "credentialsId": "aws_creds",
+        "credentialsId": "rd_ibm_aws",
         "endpoint_types": [
             {
                 "count": 1,
