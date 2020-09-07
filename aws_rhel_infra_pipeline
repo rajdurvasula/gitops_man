@@ -1,0 +1,85 @@
+pipeline {
+    agent none
+
+    parameters {
+        string defaultValue: 'aws_creds', description: 'AWS cred id', name: 'param_aws_creds'
+        string defaultValue: 'rd_ssh_key', description: 'SSH key', name: 'param_ssh_key'
+        string defaultValue: 'input.tfvars', description: 'Terraform input vars file', name: 'input_vars_file', trim: false
+    }
+
+    stages {
+        stage("initialize") {
+            agent {
+                label "config_node"
+            }
+            steps {
+        withCredentials([[
+          $class: 'AmazonWebServicesCredentialsBinding',
+          credentialsId: ${param_aws_creds},
+          accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+          secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+        ]]) {
+          sh 'terraform init'
+        }
+      }
+    }
+    stage("prepare") {
+      agent {
+        label 'config_node'
+      }
+      steps {
+        withCredentials([sshUserPrivateKey(
+          credentialsId: ${param_ssh_key},
+          keyFileVariable: 'SSH_KEY'
+        )]) {
+          sh 'rm -f $HOME/rd_ssh_key.pem'
+          sh 'cp "$SSH_KEY" $HOME/rd_ssh_key.pem'
+        }
+        withCredentials([[
+          $class: 'AmazonWebServicesCredentialsBinding',
+          credentialsId: aws_creds,
+          accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+          secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+        ]]) {
+          sh 'terraform plan -out test.plan'
+        }
+      }
+    }
+    stage("deploy") {
+      agent {
+        label 'config_node'
+      }
+      when {
+        branch 'jenkins-pr1'
+      }
+      steps {
+        withCredentials([[
+          $class: 'AmazonWebServicesCredentialsBinding',
+          credentialsId: aws_creds,
+          accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+          secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+        ]]) {
+          sh 'terraform apply -auto-approve'
+        }
+      }
+    }
+    stage('status') {
+      agent {
+        label 'config_node'
+      }
+      when {
+        branch 'jenkins-pr1'
+      }
+      steps {
+        withCredentials([[
+          $class: 'AmazonWebServicesCredentialsBinding',
+          credentialsId: aws_creds,
+          accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+          secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+        ]]) {
+          sh 'terraform show'
+        }
+      }
+    }
+  }
+}

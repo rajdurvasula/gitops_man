@@ -37,15 +37,20 @@ pipeline {
                 def manifest = readJSON file: "${params.manifest}"
                 def job
                 if (manifest.infrastructure.provider == "aws") {
-                    if (manifest.infrastructure.endpoint_types[?type == 'rhel']) {
-                        job = build job: "aws_rhel_infra_pipeline",
-                        parameters: [
-                            [$class: 'StringParameterValue', name: 'aws_cred_id', manifest.infrastructure.credentialsId],
-                            [$class: 'StringParameterValue', name: 'inst_count', manifest.endpoint_types[type=='rhel'].count],
-                            [$class: 'StringParameterValue', name: 'inst_user', manifest.endpoint_types[type=='rhel'].user],
-                            [$class: 'StringParameterValue', name: 'ssh_cred_id', manifest.endpoint_types[type=='rhel'].credentialsId],
-                            [$class: 'StringParameterValue', name: 'terraform_script', manifest.terraform.rhel.file]
-                        ]
+                    for (def ep_type : manifest.infrastructure.endpoint_types) {
+                        if (ep_type.type == 'rhel') {
+                            writeFile file: "${manifest.terraform.rhel.path}/input.tfvars.json" text: "{"
+                            writeFile file: "${manifest.terraform.rhel.path}/input.tfvars.json" text: "rhel_inst_count: ${ep_type.count}"
+                            writeFile file: "${manifest.terraform.rhel.path}/input.tfvars.json" text: "ansible_user: ${ep_type.user}"
+                            writeFile file: "${manifest.terraform.rhel.path}/input.tfvars.json" text: "}"
+                            job = build job: "aws_rhel_infra_pipeline",
+                            parameters: [
+                                [$class: 'StringParameterValue', name: 'param_aws_creds', '${manifest.infrastructure.credentialsId}']
+                                [$class: 'StringParameterValue', name: 'param_ssh_key', '${ep_type.credentialsId}']
+                                [$class: 'StringParameterValue', name: 'input_vars_file', '${manifest.terraform.rhel.path}/input.tfvars']
+                            ]
+                            break
+                        }
                     }
                 }
             }

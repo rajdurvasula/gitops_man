@@ -8,13 +8,14 @@
                 "count": 1,
                 "type": "rhel",
                 "user": "ec2-user",
-                "credentialsId": "rhel_ssh_key"
+                "credentialsId": "rd_ssh_key"
             }
         ]
     },
     "terraform": {
         "aws": {
             "rhel": {
+                "path": "aws/rhel",
                 "file": "aws/rhel/resources.tf"
             }
         }
