@@ -40,7 +40,7 @@ pipeline {
           sh 'cp "$SSH_KEY" $HOME/rd_ssh_key.pem'
         }
         script {
-            sh 'cd ${terraform_ws} && echo \"ansible_user = \"${param_ansible_user}\"\" > input.tfvars'
+            sh 'cd ${terraform_ws} && echo \"ansible_user = \\\"${param_ansible_user}\\\"\" > input.tfvars'
         }
         withCredentials([[
           $class: 'AmazonWebServicesCredentialsBinding',
