@@ -37,12 +37,12 @@ resource "aws_security_group" "my_sg" {
 # Create RHEL8 Instance for testing
 resource "aws_instance" "rhel8_client" {
   ami = "${lookup(var.rhel8_regional_ami, var.my_region)}"
-  count = 1
+  count = var.rhel_inst_count
   instance_type = var.instance_type
   key_name = var.key_pair_name
   vpc_security_group_ids = [ aws_security_group.my_sg.id ]
   subnet_id = var.my_subnet_id
-  tags = "${merge({"Name"="rhel8_client"}, var.my_tags)}"
+  tags = "${merge({"Name"="rhel8_client-${count.index}"}, var.my_tags)}"
 
   provisioner "remote-exec" {
     inline = [ "echo 'Hello World'" ]
