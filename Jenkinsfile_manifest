@@ -10,7 +10,19 @@ pipeline {
     }
 
     stages {
+        stage('Get Code') {
+            agent {
+                label "config_node"
+            }
+            steps {
+                cleanWs()
+                checkout scm
+            }
+        }
         stage('Read Config') {
+            agent {
+                label "config_node"
+            }
             steps {
                 deployWithManifest([
                     manifestfile: "${params.manifest}"
@@ -18,6 +30,9 @@ pipeline {
             }
         }
         stage('Launch Infrastructure Pipeline') {
+            agent {
+                label "config_node"
+            }
             steps {
                 def manifest = readJSON file: "${params.manifest}"
                 def job
@@ -29,6 +44,7 @@ pipeline {
                             [$class: 'StringParameterValue', name: 'inst_count', manifest.endpoint_types[type=='rhel'].count],
                             [$class: 'StringParameterValue', name: 'inst_user', manifest.endpoint_types[type=='rhel'].user],
                             [$class: 'StringParameterValue', name: 'ssh_cred_id', manifest.endpoint_types[type=='rhel'].credentialsId],
+                            [$class: 'StringParameterValue', name: 'terraform_script', manifest.terraform.rhel.file]
                         ]
                     }
                 }
