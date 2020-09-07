@@ -5,7 +5,7 @@
         "credentialsId": "rd_ibm_aws",
         "endpoint_types": [
             {
-                "count": 1,
+                "count": 2,
                 "type": "rhel",
                 "user": "ec2-user",
                 "credentialsId": "rd_ssh_key"
