@@ -56,9 +56,6 @@ pipeline {
       agent {
         label 'config_node'
       }
-      when {
-        branch 'jenkins-pr1'
-      }
       steps {
         withCredentials([[
           $class: 'AmazonWebServicesCredentialsBinding',
@@ -73,9 +70,6 @@ pipeline {
     stage('status') {
       agent {
         label 'config_node'
-      }
-      when {
-        branch 'jenkins-pr1'
       }
       steps {
         withCredentials([[
