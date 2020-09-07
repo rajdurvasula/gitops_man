@@ -49,13 +49,4 @@ resource "aws_instance" "rhel8_client" {
       var.my_tags
   )
   
-  provisioner "remote-exec" {
-    inline = [ "echo 'Hello World'" ]
-    connection {
-      type = "ssh"
-      user = var.ansible_user
-      host = aws_instance.rhel8_client[count.index].private_ip
-      private_key = file(var.private_key)
-    }
-  }
 }
