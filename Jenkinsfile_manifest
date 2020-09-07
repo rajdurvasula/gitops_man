@@ -20,9 +20,11 @@ pipeline {
                 label "config_node"
             }
             steps {
-                deployWithManifest([
-                    manifestfile: "${params.manifest}"
-                ])
+                script {
+                    deployWithManifest([
+                        manifestfile: "${params.manifest}"
+                    ])
+                }
             }
         }
         stage('Launch Infrastructure Pipeline') {
@@ -30,21 +32,23 @@ pipeline {
                 label "config_node"
             }
             steps {
-                def manifest = readJSON file: "${params.manifest}"
-                def job
-                if (manifest.infrastructure.provider == "aws") {
-                    for (def ep_type : manifest.infrastructure.endpoint_types) {
-                        if (ep_type.type == 'rhel') {
-                            writeFile file: "${manifest.terraform.rhel.path}/input.tfvars", text: "rhel_inst_count: ${ep_type.count}"
-                            writeFile file: "${manifest.terraform.rhel.path}/input.tfvars", text: "ansible_user: ${ep_type.user}"
-                            
-                            job = build job: "aws_rhel_infra_pipeline", wait: true, propagate: true,
-                            parameters: [
-                                [$class: 'StringParameterValue', name: 'param_aws_creds', value: "${manifest.infrastructure.credentialsId}"]
-                                [$class: 'StringParameterValue', name: 'param_ssh_key', value: "${ep_type.credentialsId}"]
-                                [$class: 'StringParameterValue', name: 'input_vars_file', value: "${manifest.terraform.rhel.path}/input.tfvars"]
-                            ]
-                            break
+                script {
+                    def manifest = readJSON file: "${params.manifest}"
+                    def job
+                    if (manifest.infrastructure.provider == "aws") {
+                        for (def ep_type : manifest.infrastructure.endpoint_types) {
+                            if (ep_type.type == 'rhel') {
+                                writeFile file: "${manifest.terraform.rhel.path}/input.tfvars", text: "rhel_inst_count: ${ep_type.count}"
+                                writeFile file: "${manifest.terraform.rhel.path}/input.tfvars", text: "ansible_user: ${ep_type.user}"
+                                
+                                job = build job: "aws_rhel_infra_pipeline", wait: true, propagate: true,
+                                parameters: [
+                                    [$class: 'StringParameterValue', name: 'param_aws_creds', value: "${manifest.infrastructure.credentialsId}"]
+                                    [$class: 'StringParameterValue', name: 'param_ssh_key', value: "${ep_type.credentialsId}"]
+                                    [$class: 'StringParameterValue', name: 'input_vars_file', value: "${manifest.terraform.rhel.path}/input.tfvars"]
+                                ]
+                                break
+                            }
                         }
                     }
                 }
