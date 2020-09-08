@@ -1,3 +1,5 @@
+def workspace_path = env.WORKSPACE
+
 pipeline {
     agent none
 
@@ -36,14 +38,13 @@ pipeline {
           credentialsId: "${param_ssh_key}",
           keyFileVariable: 'SSH_KEY'
         )]) {
-          def workspace_path = env.WORKSPACE
           sh 'rm -f ${workspace_path}/${terraform_ws}/rd_ssh_key.pem'
           sh 'cp "$SSH_KEY" ${workspace_path}/${terraform_ws}/rd_ssh_key.pem'
         }
         script {
             sh 'cd ${terraform_ws} && echo \"ansible_user = \\\"${param_ansible_user}\\\"\" > input.tfvars'
             sh 'cd ${terraform_ws} && echo \"rhel_inst_count = ${param_inst_count}\" >> input.tfvars'
-            sh 'cd ${terraform_ws} && echo \"private_key = \\\"${env.WORKSPACE}/${terraform_ws}/rd_ssh_key.pem\\\"\" >> input.tfvars'
+            sh 'cd ${terraform_ws} && echo \"private_key = \\\"${workspace_path}/${terraform_ws}/rd_ssh_key.pem\\\"\" >> input.tfvars'
         }
         withCredentials([[
           $class: 'AmazonWebServicesCredentialsBinding',
