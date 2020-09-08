@@ -54,6 +54,8 @@ resource "aws_instance" "rhel8_client" {
 data "template_file" "ansible_inventory" {
   template = file("rhel_ansible_inv.tpl")
   vars = {
+    ep_user = var.ansible_user
+    user_ssh_key_file = var.private_key
     rhel_host_name = join("\n", aws_instance.rhel8_client.*.public_dns)
   }
 }

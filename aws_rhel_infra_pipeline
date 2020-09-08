@@ -36,8 +36,9 @@ pipeline {
           credentialsId: "${param_ssh_key}",
           keyFileVariable: 'SSH_KEY'
         )]) {
-          sh 'rm -f ${env.WORKSPACE}/${terraform_ws}/rd_ssh_key.pem'
-          sh 'cp "$SSH_KEY" ${env.WORKSPACE}/${terraform_ws}/rd_ssh_key.pem'
+          def workspace_path = env.WORKSPACE
+          sh 'rm -f ${workspace_path}/${terraform_ws}/rd_ssh_key.pem'
+          sh 'cp "$SSH_KEY" ${workspace_path}/${terraform_ws}/rd_ssh_key.pem'
         }
         script {
             sh 'cd ${terraform_ws} && echo \"ansible_user = \\\"${param_ansible_user}\\\"\" > input.tfvars'
