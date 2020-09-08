@@ -52,14 +52,14 @@ resource "aws_instance" "rhel8_client" {
 
 # data variable for template file
 data "template_file" "ansible_inventory" {
-  template = "${file("rhel_ansible_inv.tpl")}"
-  vars {
-    rhel_host_name = "${join("\n", aws_instance.rhel8_client.*.public_dns)}"
+  template = file("rhel_ansible_inv.tpl")
+  vars = {
+    rhel_host_name = join("\n", aws_instance.rhel8_client.*.public_dns)
   }
 }
 
 # ansible inventory file
 resource "local_file" "inventory_hosts" {
-  content = "${data.template_file.ansible_inventory.rendered}"
+  content = data.template_file.ansible_inventory.rendered
   filename = "inventory_hosts"
 }
