@@ -56,7 +56,7 @@ data "template_file" "ansible_inventory" {
   vars = {
     ep_user = var.ansible_user
     user_ssh_key_file = var.private_key
-    rhel_host_name = join("\n", "${aws_instance.rhel8_client.*.public_dns}")
+    rhel_host_name = "${join("\n", "${aws_instance.rhel8_client.*.public_dns}")}"
   }
 }
 
