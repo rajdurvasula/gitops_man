@@ -1,5 +1,3 @@
-def workspace_path = env.WORKSPACE
-
 pipeline {
     agent none
 
@@ -32,6 +30,7 @@ pipeline {
     stage("prepare") {
       agent {
         label 'config_node'
+        def workspace_path = env.WORKSPACE
       }
       steps {
         withCredentials([sshUserPrivateKey(
