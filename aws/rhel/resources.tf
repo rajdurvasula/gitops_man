@@ -52,6 +52,6 @@ resource "aws_instance" "rhel8_client" {
 
 # write ansible inventory file
 resource "local_file" "inventory_hosts" {
-  content = "[rhel]\n${join("\n", formatList("%s", aws_instance.rhel8_client.*.public_dns))}\n\n[rhel:vars]\nansible_user=var.ansible_user\nansible_ssh_private_key_file=var.private_key"
+  content = "[rhel]\n${join("\n", formatlist("%s", aws_instance.rhel8_client.*.public_dns))}\n\n[rhel:vars]\nansible_user=var.ansible_user\nansible_ssh_private_key_file=var.private_key"
   filename = "inventory_hosts"
 }
