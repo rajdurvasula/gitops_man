@@ -25,6 +25,7 @@
         "endpoint_types": [
             {
                 "type": "rhel",
+                "inventory_file": "inventory_hosts",
                 "playbooks": [
                     {
                         "file": "install_wildfly.yml",
