@@ -7,7 +7,22 @@ properties ([
 
 node {
 
+    def SCM_URL = "https://github.com/rajdurvasula/gitops_man.git"
+    def SCM_REF = ""
     def tfvars_txt = ""
+
+    stage("Checkout SCM") {
+        cleanWs()
+        
+        SCM_REF = checkout([
+            $class: 'GitSCM',
+            branches: [[name: 'master']],
+            userRemoteConfigs: [[
+                url: '${SCM_URL}',
+                credentialsId: 'rd_git'
+            ]]
+        ])
+    }
 
     stage('Plan') {
         withCredentials([sshUserPrivateKey(
