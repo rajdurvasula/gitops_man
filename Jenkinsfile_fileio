@@ -17,32 +17,34 @@ pipeline  {
             agent  {
                 label "config_node"
             }
+            steps {
+                cleanWs()
+                
+                SCM_REF = checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: 'master']],
+                    userRemoteConfigs: [[
+                        url: '${SCM_URL}',
+                        credentialsId: 'rd_git'
+                    ]]
+                ])
+            }
 
-            cleanWs()
-            
-            SCM_REF = checkout([
-                $class: 'GitSCM',
-                branches: [[name: 'master']],
-                userRemoteConfigs: [[
-                    url: '${SCM_URL}',
-                    credentialsId: 'rd_git'
-                ]]
-            ])
         }
 
         stage('Plan') {
             agent  {
                 label "config_node"
             }
-
-            withCredentials([sshUserPrivateKey(
-                credentialsId: 'rd_ssh',
-                keyFileVariable: 'SSH_KEY'
-            )]) {
-                sh "rm -f ${env.WORKSPACE}/rd_ssh_key.pem"
-                sh "cp $SSH_KEY ${env.WORKSPACE}/rd_ssh_key.pem"
-            }
             steps {
+                withCredentials([sshUserPrivateKey(
+                    credentialsId: 'rd_ssh',
+                    keyFileVariable: 'SSH_KEY'
+                )]) {
+                    sh "rm -f ${env.WORKSPACE}/rd_ssh_key.pem"
+                    sh "cp $SSH_KEY ${env.WORKSPACE}/rd_ssh_key.pem"
+                }
+                
                 script {
                     tfvars_txt = $tfvars_txt + "Hello World !"
                 }
