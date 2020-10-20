@@ -24,7 +24,7 @@ pipeline  {
                     $class: 'GitSCM',
                     branches: [[name: 'master']],
                     userRemoteConfigs: [[
-                        url: '${SCM_URL}',
+                        url: "${SCM_URL}",
                         credentialsId: 'rd_git'
                     ]]
                 ])
