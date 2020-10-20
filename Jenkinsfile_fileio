@@ -49,7 +49,7 @@ pipeline  {
                     tfvars_txt = "${tfvars_txt}" + "Hello World !"
                     tfvars_txt = "${tfvars_txt}" + "\nFrom Raj"
                 }
-                fileOperations([fileCreateOperation(fileName: "${env.WORKSPACE}/params.TFVARS_FILE", fileContent: "${tfvars_txt}")])
+                fileOperations([fileCreateOperation(fileName: params.TFVARS_FILE, fileContent: "${tfvars_txt}")])
             }
         }       
     }
