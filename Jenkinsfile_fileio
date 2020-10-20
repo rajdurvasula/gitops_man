@@ -38,7 +38,7 @@ pipeline  {
             }
             steps {
                 withCredentials([sshUserPrivateKey(
-                    credentialsId: 'rd_ssh',
+                    credentialsId: 'bm-rd-sing-kp2',
                     keyFileVariable: 'SSH_KEY'
                 )]) {
                     sh "rm -f ${env.WORKSPACE}/rd_ssh_key.pem"
