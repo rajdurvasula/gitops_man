@@ -10,44 +10,44 @@ pipeline  {
     def SCM_REF = ""
     def tfvars_txt = ""
 
-    stage("Checkout SCM") {
-        agent  {
-            label "config_node"
-        }
-
-        cleanWs()
-        
-        SCM_REF = checkout([
-            $class: 'GitSCM',
-            branches: [[name: 'master']],
-            userRemoteConfigs: [[
-                url: '${SCM_URL}',
-                credentialsId: 'rd_git'
-            ]]
-        ])
-    }
-
-    stage('Plan') {
-        agent  {
-            label "config_node"
-        }
-
-        withCredentials([sshUserPrivateKey(
-            credentialsId: 'rd_ssh',
-            keyFileVariable: 'SSH_KEY'
-        )]) {
-            sh "rm -f ${env.WORKSPACE}/rd_ssh_key.pem"
-            sh "cp $SSH_KEY ${env.WORKSPACE}/rd_ssh_key.pem"
-        }
-        steps {
-            script {
-                tfvars_txt = $tfvars_txt + "Hello World !"
+    stages {
+        stage("Checkout SCM") {
+            agent  {
+                label "config_node"
             }
-            fileOperations {
-                fileCreateOperation(params.TFVARS_FILE, tfvars_txt)
-            }
+
+            cleanWs()
+            
+            SCM_REF = checkout([
+                $class: 'GitSCM',
+                branches: [[name: 'master']],
+                userRemoteConfigs: [[
+                    url: '${SCM_URL}',
+                    credentialsId: 'rd_git'
+                ]]
+            ])
         }
+
+        stage('Plan') {
+            agent  {
+                label "config_node"
+            }
+
+            withCredentials([sshUserPrivateKey(
+                credentialsId: 'rd_ssh',
+                keyFileVariable: 'SSH_KEY'
+            )]) {
+                sh "rm -f ${env.WORKSPACE}/rd_ssh_key.pem"
+                sh "cp $SSH_KEY ${env.WORKSPACE}/rd_ssh_key.pem"
+            }
+            steps {
+                script {
+                    tfvars_txt = $tfvars_txt + "Hello World !"
+                }
+                fileOperations {
+                    fileCreateOperation(params.TFVARS_FILE, tfvars_txt)
+                }
+            }
+        }       
     }
 }
-
-
