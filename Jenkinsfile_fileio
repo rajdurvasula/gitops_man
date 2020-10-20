@@ -8,7 +8,7 @@ pipeline  {
     agent none
 
     parameters {
-        choice(choices: ['win2016','rhel7','rhel8','sles15'], name: 'OS_TYPE', defaultValue: 'rhel8', description: 'Endpoint Operating System')
+        choice(name: 'OS_TYPE', choices: ['win2016','rhel7','rhel8','sles15'], description: 'Endpoint Operating System')
         string(name: 'TFVARS_FILE', defaultValue: 'input.tfvars', description: 'Terraform Parameters file')
     }
 
