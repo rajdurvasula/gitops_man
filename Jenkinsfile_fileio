@@ -1,0 +1,29 @@
+properties ([
+    parameters([
+        choice(choices: ['win2016','rhel7','rhel8','sles15'], name: 'OS_TYPE', defaultValue: 'rhel8', description: 'Endpoint Operating System'),
+        string(name: 'TFVARS_FILE', defaultValue: 'input.tfvars', description: 'Terraform Parameters file')
+    ])
+])
+
+node {
+
+    def tfvars_txt = ""
+
+    stage('Plan') {
+        withCredentials([sshUserPrivateKey(
+            credentialsId: 'rd_ssh',
+            keyFileVariable: 'SSH_KEY'
+        )]) {
+            sh "rm -f ${env.WORKSPACE}/rd_ssh_key.pem"
+            sh "cp $SSH_KEY ${env.WORKSPACE}/rd_ssh_key.pem"
+        }
+        steps {
+            script {
+                tfvars_txt = $tfvars_txt + "Hello World !"
+            }
+            fileOperations {
+                fileCreateOperation(params.TFVARS_FILE, tfvars_txt)
+            }
+        }
+    }
+}
