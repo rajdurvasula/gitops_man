@@ -20,7 +20,7 @@ pipeline  {
             steps {
                 cleanWs()
                 
-                SCM_REF = checkout([
+                checkout([
                     $class: 'GitSCM',
                     branches: [[name: 'master']],
                     userRemoteConfigs: [[
@@ -44,7 +44,7 @@ pipeline  {
                     sh "rm -f ${env.WORKSPACE}/rd_ssh_key.pem"
                     sh "cp $SSH_KEY ${env.WORKSPACE}/rd_ssh_key.pem"
                 }
-                
+
                 script {
                     tfvars_txt = $tfvars_txt + "Hello World !"
                 }
