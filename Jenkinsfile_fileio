@@ -12,6 +12,10 @@ node {
     def tfvars_txt = ""
 
     stage("Checkout SCM") {
+        agent  {
+            label "config_node"
+        }
+
         cleanWs()
         
         SCM_REF = checkout([
@@ -25,6 +29,10 @@ node {
     }
 
     stage('Plan') {
+        agent  {
+            label "config_node"
+        }
+
         withCredentials([sshUserPrivateKey(
             credentialsId: 'rd_ssh',
             keyFileVariable: 'SSH_KEY'
