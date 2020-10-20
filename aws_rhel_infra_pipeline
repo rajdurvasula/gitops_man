@@ -1,0 +1,88 @@
+pipeline {
+    agent none
+
+    parameters {
+        string defaultValue: 'aws_creds', description: 'AWS cred id', name: 'param_aws_creds'
+        string defaultValue: 'rd_ssh_key', description: 'SSH key', name: 'param_ssh_key'
+        string defaultValue: 'input.tfvars', description: 'Terraform input vars file', name: 'input_vars_file'
+        string defaultValue: 'test', description: 'Terraform workspace name', name: 'terraform_ws_name'
+        string defaultValue: 'test', description: 'Terraform workspace', name: 'terraform_ws'
+        string defaultValue: 'ansible', description: 'Ansible user', name: 'param_ansible_user'
+        string defaultValue: '1', description: 'Instance count', name: 'param_inst_count'
+    }
+
+    stages {
+        stage("initialize") {
+            agent {
+                label "config_node"
+            }
+            steps {
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: "${param_aws_creds}",
+                    accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                    secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+                ]]) {
+                    sh 'cd ${terraform_ws} && terraform init'                    
+                }
+            }
+        }
+    stage("prepare") {
+      agent {
+        label 'config_node'
+      }
+      steps {
+        withCredentials([sshUserPrivateKey(
+          credentialsId: "${param_ssh_key}",
+          keyFileVariable: 'SSH_KEY'
+        )]) {
+          sh "rm -f ${env.WORKSPACE}/${terraform_ws}/rd_ssh_key.pem"
+          sh "cp $SSH_KEY ${env.WORKSPACE}/${terraform_ws}/rd_ssh_key.pem"
+        }
+        script {
+            sh "cd ${terraform_ws} && echo \"ansible_user = \\\"${param_ansible_user}\\\"\" > input.tfvars"
+            sh "cd ${terraform_ws} && echo \"rhel_inst_count = ${param_inst_count}\" >> input.tfvars"
+            sh "cd ${terraform_ws} && echo \"private_key = \\\"${env.WORKSPACE}/${terraform_ws}/rd_ssh_key.pem\\\"\" >> input.tfvars"
+        }
+        withCredentials([[
+          $class: 'AmazonWebServicesCredentialsBinding',
+          credentialsId: "${param_aws_creds}",
+          accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+          secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+        ]]) {
+          sh 'cd ${terraform_ws} && terraform plan -out test.plan -var-file input.tfvars'
+        }
+      }
+    }
+    stage("deploy") {
+      agent {
+        label 'config_node'
+      }
+      steps {
+        withCredentials([[
+          $class: 'AmazonWebServicesCredentialsBinding',
+          credentialsId: "${param_aws_creds}",
+          accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+          secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+        ]]) {
+          sh 'cd ${terraform_ws} && terraform apply -auto-approve test.plan'
+        }
+      }
+    }
+    stage('status') {
+      agent {
+        label 'config_node'
+      }
+      steps {
+        withCredentials([[
+          $class: 'AmazonWebServicesCredentialsBinding',
+          credentialsId: "${param_aws_creds}",
+          accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+          secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+        ]]) {
+          sh 'cd ${terraform_ws} && terraform show'
+        }
+      }
+    }
+  }
+}

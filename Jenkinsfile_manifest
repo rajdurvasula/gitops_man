@@ -1,0 +1,47 @@
+pipeline {
+    agent none
+
+    parameters {
+        string(name: 'manifest', defaultValue: 'manifest.default.json', description: 'Manifest from Git source')
+    }
+
+    stages {
+        stage('Get Code') {
+            agent {
+                label "config_node"
+            }
+            steps {
+                cleanWs()
+                checkout scm
+            }
+        }
+        stage('Launch Infrastructure Pipeline') {
+            agent {
+                label "config_node"
+            }
+            steps {
+                script {
+                    def manifest = readJSON file: "${params.manifest}"
+                    def job
+                    if (manifest.infrastructure.provider == "aws") {
+                        for (def ep_type : manifest.infrastructure.endpoint_types) {
+                            if (ep_type.type == 'rhel') {
+                                job = build job: "aws_rhel_infra_pipeline", wait: true, propagate: true,
+                                parameters: [
+                                    [$class: 'StringParameterValue', name: 'param_aws_creds', value: "${manifest.infrastructure.credentialsId}"],
+                                    [$class: 'StringParameterValue', name: 'param_ssh_key', value: "${ep_type.credentialsId}"],
+                                    [$class: 'StringParameterValue', name: 'input_vars_file', value: "${manifest.terraform.aws.rhel.path}/input.tfvars"],
+                                    [$class: 'StringParameterValue', name: 'terraform_ws_name', value: "${manifest.terraform.aws.rhel.ref}"],
+                                    [$class: 'StringParameterValue', name: 'terraform_ws', value: "${manifest.terraform.aws.rhel.path}"],
+                                    [$class: 'StringParameterValue', name: 'param_ansible_user', value: "${ep_type.user}"],
+                                    [$class: 'StringParameterValue', name: 'param_inst_count', value: "${ep_type.count}"]
+                                ]
+                                break
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
