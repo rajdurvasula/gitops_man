@@ -46,8 +46,23 @@ pipeline  {
                 }
 
                 script {
-                    tfvars_txt = "${tfvars_txt}" + "Hello World !"
-                    tfvars_txt = "${tfvars_txt}" + "\nFrom Raj"
+                    tfvars_txt = "${tfvars_txt}" + "key_path  = ${env.WORKSPACE}"
+                    tfvars_txt = "${tfvars_txt}" + "\nprivate_key = ${env.WORKSPACE}/rd_ssh_key.pem"
+                    if (params.OS_TYPE != "win2016") {
+                        if (params.OS_TYPE == "rhel8") {
+                            tfvars_txt = "${tfvars_txt}" + "\nrhel8_instance = {"  
+                            tfvars_txt = "${tfvars_txt}" + "\nami = ami-090b3d236da86de88"
+                        } else if (params.OS_TYPE == "rhel7") {
+                            tfvars_txt = "${tfvars_txt}" + "\nrhel7_instance = {"
+                            tfvars_txt = "${tfvars_txt}" + "\nami-07d8d14365439bc6e"
+                        } else if (params.OS_TYPE == "sles15") {
+                            tfvars_txt = "${tfvars_txt}" + "\nsles15_instance = {"
+                            tfvars_txt = "${tfvars_txt}" + "\nami = ami-0ac3dbf3917611d92"
+                        }
+                        tfvars_txt = "${tfvars_txt}" + "\nregion = us-west-1"
+                        tfvars_txt = "${tfvars_txt}" + "\nansible_user = ec2-user"
+                        tfvars_txt = "${tfvars_txt}" + "\n}"
+                    }
                 }
                 fileOperations([fileCreateOperation(fileName: params.TFVARS_FILE, fileContent: "${tfvars_txt}")])
             }
