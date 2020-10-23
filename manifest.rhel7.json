@@ -6,7 +6,7 @@
         "endpoint_types": [
             {
                 "count": 2,
-                "type": "rhel7",
+                "os": "rhel7",
                 "user": "ec2-user",
                 "credentialsId": "rd_ssh_key"
             }
