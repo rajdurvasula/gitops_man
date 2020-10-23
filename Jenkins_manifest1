@@ -33,7 +33,7 @@ pipeline {
                     def job
                     if (manifest.infrastructure.provider == "aws") {
                         for (def ep_type : manifest.infrastructure.endpoint_types) {
-                            if (ep_type.type == 'rhel7') {
+                            if (ep_type.os == 'rhel7') {
                                 job = build job: "${params.aws_pipeline}", wait: true, propagate: true,
                                 parameters: [
                                     [$class: 'StringParameterValue', name: 'OS_TYPE', value: "${ep_type.os}"],
