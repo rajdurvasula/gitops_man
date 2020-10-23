@@ -65,20 +65,20 @@ pipeline {
                         tfvars_txt = "${tfvars_txt}" + "\nansible_user = \"ec2-user\""
                         tfvars_txt = "${tfvars_txt}" + "\n}"
                     }
+                }            
+                // write tfvars
+                fileOperations([fileCreateOperation(fileName: params.TFVARS_FILE, fileContent: "${tfvars_txt}")])
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: 'rd_mcms',
+                    accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                    secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+                ]]) {
+                    sh "set +x && \
+                    cd ./pipeline_code/jenkins-code/aws/ && \
+                    /usr/bin/terraform init && \
+                    /usr/bin/terraform plan -out=test.plan -var-file=${env.WORKSPACE}/${params.TFVARS_FILE} --var os_type=${params.OS_TYPE}"
                 }
-            }
-            // write tfvars
-            fileOperations([fileCreateOperation(fileName: params.TFVARS_FILE, fileContent: "${tfvars_txt}")])
-            withCredentials([[
-                $class: 'AmazonWebServicesCredentialsBinding',
-                credentialsId: 'rd_mcms',
-                accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-                secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
-            ]]) {
-                sh "set +x && \
-                cd ./pipeline_code/jenkins-code/aws/ && \
-                /usr/bin/terraform init && \
-                /usr/bin/terraform plan -out=test.plan -var-file=${env.WORKSPACE}/${params.TFVARS_FILE} --var os_type=${params.OS_TYPE}"
             }
         }
 
