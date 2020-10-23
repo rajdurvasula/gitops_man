@@ -75,7 +75,7 @@ pipeline {
                     secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
                 ]]) {
                     sh "set +x && \
-                    cd ./pipeline_code/jenkins-code/aws/ && \
+                    cd ./pipeline_code/aws/rhel/ && \
                     /usr/bin/terraform init && \
                     /usr/bin/terraform plan -out=test.plan -var-file=${env.WORKSPACE}/${params.TFVARS_FILE} --var os_type=${params.OS_TYPE}"
                 }
@@ -91,7 +91,7 @@ pipeline {
                     secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
                 ]]) {
                     sh "set +x && \
-                    cd ./pipeline_code/jenkins-code/aws/ && \
+                    cd ./pipeline_code/aws/rhel/ && \
                     /usr/bin/terraform apply -auto-approve test.plan"
                 }
             }
@@ -112,7 +112,7 @@ pipeline {
                         for (def playbookRef : manifest.ansible.playbooks) {
                             ansiblePlaybook(
                                 playbook: "${playbookRef.file}",
-                                inventory: "pipeline_code/jenkins-code/aws/inventory_hosts"
+                                inventory: "pipeline_code/aws/rhel/inventory_hosts"
                             )
                         }
                     } catch (hudson.AbortException ae) {
