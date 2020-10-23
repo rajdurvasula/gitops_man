@@ -31,17 +31,15 @@ pipeline {
                 script {
                     def manifest = readJSON file: "${params.manifest}"
                     def job
-                    echo "provider = "+manifest.infrastructure.provider
                     if (manifest.infrastructure.provider == "aws") {
                         for (def ep_type : manifest.infrastructure.endpoint_types) {
                             if (ep_type.type == 'rhel7') {
-                                echo "type = "+ep_type.type
-                                //job = build job: "${params.aws_pipeline}", wait: true, propagate: true,
-                                //parameters: [
-                                //    [$class: 'StringParameterValue', name: 'OS_TYPE', value: "${ep_type.os}"],
-                                //    [$class: 'StringParameterValue', name: 'AMI', value: "${manifest.terraform.aws.rhel7.ami}"],
-                                //    [$class: 'StringParameterValue', name: 'manifest_file', value: "${params.manifest}"]
-                                //]
+                                job = build job: "${params.aws_pipeline}", wait: true, propagate: true,
+                                parameters: [
+                                    [$class: 'StringParameterValue', name: 'OS_TYPE', value: "${ep_type.os}"],
+                                    [$class: 'StringParameterValue', name: 'AMI', value: "${manifest.terraform.aws.rhel7.ami}"],
+                                    [$class: 'StringParameterValue', name: 'manifest_file', value: "${params.manifest}"]
+                                ]
                             }
                         }
                     }
