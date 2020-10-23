@@ -14,8 +14,8 @@
     },
     "terraform": {
         "aws": {
-            "rhel": {
-                "ref": "rhel",
+            "rhel7": {
+                "ami": "ami-07d8d14365439bc6e",
                 "path": "aws/rhel",
                 "file": "aws/rhel/resources.tf"
             }
