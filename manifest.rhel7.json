@@ -6,7 +6,7 @@
         "endpoint_types": [
             {
                 "count": 2,
-                "type": "rhel",
+                "type": "rhel7",
                 "user": "ec2-user",
                 "credentialsId": "rd_ssh_key"
             }
@@ -24,7 +24,6 @@
     "ansible": {
         "endpoint_types": [
             {
-                "type": "rhel7",
                 "inventory_file": "inventory_hosts",
                 "playbooks": [
                     {
