@@ -1,14 +1,30 @@
+// Manifest Pipeline
 
+SCM_URL = "https://github.com/rajdurvasula/gitops_man.git"
 
 pipeline {
     agent any
 
     parameters {
-        string(name: 'manifest', defaultValue: 'manifest.rhel8.json', description: 'Manifest from Git source')
-	    string(name: 'aws_pipeline', defaultValue: 'Jenkins-pubcloud-aws', description: 'Pipeline project')
+        string(name: 'manifest', defaultValue: 'manifest.rhel7.json', description: 'Manifest from Git source')
+	    string(name: 'aws_pipeline', defaultValue: 'Jenkins-pubcloud-aws1', description: 'Pipeline project')
     }
 
     stages {
+
+        stage('Get Config') {
+            steps {
+                cleanWs()
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[ name: 'rd_pr2' ]],
+                    userRemoteConfigs: [[
+                        url: "${SCM_URL}",
+                        credentialsId: "rd_git"
+                    ]]
+                ])
+            }
+        }
 
         stage('Launch Pipeline') {
             steps {

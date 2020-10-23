@@ -22,7 +22,7 @@ pipeline {
                 cleanWs()
                 checkout([
                     $class: 'GitSCM',
-                    branches: [[ name: 'rd_pr1' ]],
+                    branches: [[ name: 'rd_pr2' ]],
                     userRemoteConfigs: [[
                         url: "${SCM_URL}",
                         credentialsId: "rd_git"
@@ -34,7 +34,7 @@ pipeline {
         stage('Git Clone') {
             steps {
                 dir('pipeline_code') {
-                    git branch: "rd_pr1",
+                    git branch: "rd_pr2",
                     credentialsId: "rd_git",
                     url: "https://github.com/rajdurvasula/gitops_man.git"
                 }
