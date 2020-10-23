@@ -1,0 +1,51 @@
+{
+    "name": "manifest.rhel7",
+    "infrastructure": {
+        "provider": "aws",
+        "credentialsId": "rd_ibm_aws",
+        "endpoint_types": [
+            {
+                "count": 2,
+                "type": "rhel",
+                "user": "ec2-user",
+                "credentialsId": "rd_ssh_key"
+            }
+        ]
+    },
+    "terraform": {
+        "aws": {
+            "rhel": {
+                "ref": "rhel",
+                "path": "aws/rhel",
+                "file": "aws/rhel/resources.tf"
+            }
+        }
+    },
+    "ansible": {
+        "endpoint_types": [
+            {
+                "type": "rhel",
+                "inventory_file": "inventory_hosts",
+                "playbooks": [
+                    {
+                        "file": "install_wildfly.yml",
+                        "extra_args": [
+                            {
+                                "enable_firewall": "false"
+                            }
+                        ],
+                        "tags": [
+                            "setup", "sample"
+                        ]
+                    },
+                    {
+                        "file": "test.yml",
+                        "tags": [
+                            "test"
+                        ]
+                    }
+                ]
+            }
+        ] 
+    }
+}
