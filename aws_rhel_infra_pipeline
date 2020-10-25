@@ -1,3 +1,7 @@
+libraries {
+  lib('rd_utilities_lib')
+}
+
 pipeline {
     agent none
 
@@ -39,11 +43,17 @@ pipeline {
           sh "rm -f ${env.WORKSPACE}/${terraform_ws}/rd_ssh_key.pem"
           sh "cp $SSH_KEY ${env.WORKSPACE}/${terraform_ws}/rd_ssh_key.pem"
         }
+        def tfvars_txt
         script {
-            sh "cd ${terraform_ws} && echo \"ansible_user = \\\"${param_ansible_user}\\\"\" > input.tfvars"
-            sh "cd ${terraform_ws} && echo \"rhel_inst_count = ${param_inst_count}\" >> input.tfvars"
-            sh "cd ${terraform_ws} && echo \"private_key = \\\"${env.WORKSPACE}/${terraform_ws}/rd_ssh_key.pem\\\"\" >> input.tfvars"
+          tfvars_txt = create_tfvars(params.param_ansible_user, params.param_inst_count, "${env.WORKSPACE}/${terraform_ws}/rd_ssh_key.pem")
         }
+        // write tfvars
+        fileOperations([fileCreateOperation(fileName: params.input_vars_file, fileContent: "${tfvars_txt}")])
+        //script {
+        //    sh "cd ${terraform_ws} && echo \"ansible_user = \\\"${param_ansible_user}\\\"\" > input.tfvars"
+        //    sh "cd ${terraform_ws} && echo \"rhel_inst_count = ${param_inst_count}\" >> input.tfvars"
+        //    sh "cd ${terraform_ws} && echo \"private_key = \\\"${env.WORKSPACE}/${terraform_ws}/rd_ssh_key.pem\\\"\" >> input.tfvars"
+        //}
         withCredentials([[
           $class: 'AmazonWebServicesCredentialsBinding',
           credentialsId: "${param_aws_creds}",
